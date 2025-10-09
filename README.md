@@ -36,71 +36,97 @@ $$
 
 
 ### Module 02 — Option Pricing: Black–Scholes, Monte Carlo, and CRR Binomial
-- **Black–Scholes–Merton (with continuous dividend yield q)**
-- **Monte Carlo simulation (risk-neutral, GBM)**
-- **Cox–Ross–Rubinstein (CRR) binomial tree** for both **European** and **American** calls/puts
-  
-> Default parameters in the script: `S0=50, K=50, r=0.10, q=0.05, sigma=0.40, T=0.5`
+
+This module implements three classical option pricing models:
+
+- **Black–Scholes–Merton (with continuous dividend yield \(q\))**
+- **Monte Carlo Simulation** under the **risk-neutral GBM**
+- **Cox–Ross–Rubinstein (CRR) Binomial Tree** for both **European** and **American** options  
+
+> Default parameters: `S0=50, K=50, r=0.10, q=0.05, sigma=0.40, T=0.5`
+
+---
 
 ## Features
 
-- **Black–Scholes (European)** call/put with dividend yield \( q \)  
+### **Black–Scholes (European) Pricing**
 
-d1 = [ ln(S0 / K) + (r - q + 0.5 * sigma^2) * T ] / (sigma * sqrt(T))
-
-d2 = d1 - sigma * sqrt(T)
-
-Call Price (C) = S0 * exp(-q * T) * N(d1) - K * exp(-r * T) * N(d2)
-
-Put Price (P) = K * exp(-r * T) * N(-d2) - S0 * exp(-q * T) * N(-d1)
+Closed-form pricing of a European call/put with dividend yield \(q\):
 
 
-where:
-- `N(x)` is the cumulative distribution function (CDF) of the standard normal distribution
-- `exp()` is the exponential function
-- `ln()` is the natural logarithm
-  
+$$
+d_1=\frac{\ln\!\left(\frac{S_0}{K}\right)+(r-q+0.5\sigma^2)T}{\sigma\sqrt{T}},\quad
+d_2=d_1-\sigma\sqrt{T}
+$$
 
-- **Monte Carlo (risk-neutral GBM)**
+**Call**
 
-Generate random draws Z ~ N(0, 1)
+$$
+C=S_0 e^{-qT}N(d_1)-K e^{-rT}N(d_2)
+$$
 
-Simulate stock price at maturity:
-ST = S0 * exp( (r - q - 0.5 * sigma^2) * T + sigma * sqrt(T) * Z )
+**Put**
 
-Compute discounted payoff:
-For Call: C = exp(-r * T) * max(ST - K, 0)
-For Put: P = exp(-r * T) * max(K - ST, 0)
+$$
+P=K e^{-rT}N(-d_2)-S_0 e^{-qT}N(-d_1)
+$$
 
-Repeat simulation many times, take the mean payoff as the option price.
+Where \(N(\cdot)\) is the standard normal CDF.
 
-- **CRR Binomial Tree**
-  - \( u=e^{\sigma\sqrt{\Delta t}},\ d=1/u,\ p=\frac{e^{(r-q)\Delta t}-d}{u-d} \)
-  - Backward induction for **European** and **American** (early exercise) options
-  - Adjustable steps `n` (e.g., 100 / 500)
-  
-dt = T / n
-u = exp( sigma * sqrt(dt) )
-d = 1 / u
-p = ( exp((r - q) * dt) - d ) / (u - d)
-df = exp(-r * dt)
+---
 
 
-Backward induction steps:
+Where:  
+-  N(x): cumulative distribution function (CDF) of the standard normal distribution
+- Where \(N(\cdot)\) is the CDF of the standard normal distribution
 
-Compute terminal stock prices:
-S[j, i] = S0 * (u^(i-j)) * (d^j)
+---
 
-Compute terminal option values:
-For Call: v[j, i] = max(S[j, i] - K, 0)
-For Put: v[j, i] = max(K - S[j, i], 0)
+### **2️⃣ Monte Carlo Simulation (Risk-Neutral GBM)**
 
-Work backward:
-If European:
-pv[j, i] = df * (p * pv[j, i+1] + (1 - p) * pv[j+1, i+1])
-If American:
-pv[j, i] = max(df * (p * pv[j, i+1] + (1 - p) * pv[j+1, i+1]), v[j, i])
+Simulate asset paths under the risk-neutral measure:
 
-Final price = `pv[0, 0]`
+1. Generate random draws \( Z \sim N(0,1) \)
+2. Simulate stock price at maturity:  
+   \( S_T = S_0 e^{(r - q - 0.5\sigma^2)T + \sigma\sqrt{T}Z} \)
+3. Compute discounted payoffs:  
+   - Call: \( C = e^{-rT}\max(S_T - K, 0) \)  
+   - Put:  \( P = e^{-rT}\max(K - S_T, 0) \)
+4. Repeat many times and take the **mean payoff** as the option price.
+
+---
+
+### **3️⃣ CRR Binomial Tree**
+
+Cox–Ross–Rubinstein discrete-time tree model for both **European** and **American** options.
+
+#### Parameters
+$$
+u = e^{\sigma\sqrt{\Delta t}}, \quad
+d = \frac{1}{u}, \quad
+p = \frac{e^{(r-q)\Delta t} - d}{u - d}, \quad
+\text{df} = e^{-r\Delta t}
+$$
+
+Where \(\Delta t = T / n\) and `n` is the number of steps (e.g., 100, 500).
+
+#### Backward Induction
+1. Compute terminal stock prices:  
+   \( S[j,i] = S_0 \cdot u^{(i-j)} \cdot d^j \)
+
+2. Compute terminal option payoffs:  
+   - Call: \( v[j,i] = \max(S[j,i] - K, 0) \)  
+   - Put:  \( v[j,i] = \max(K - S[j,i], 0) \)
+
+3. Work backward through the tree:  
+   - **European:**  
+     \( pv[j,i] = \text{df} \cdot (p \cdot pv[j,i+1] + (1-p) \cdot pv[j+1,i+1]) \)  
+   - **American:**  
+     \( pv[j,i] = \max(\text{df} \cdot (p \cdot pv[j,i+1] + (1-p) \cdot pv[j+1,i+1]), v[j,i]) \)
+
+4. The **final option price** is the root node:
+
+
+
 
 
