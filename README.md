@@ -45,6 +45,7 @@ This module implements three classical option pricing models:
 
 > Default parameters: `S0=50, K=50, r=0.10, q=0.05, sigma=0.40, T=0.5`
 
+
 ---
 
 ## Features
@@ -55,7 +56,7 @@ Closed-form pricing of a European call/put with dividend yield \(q\):
 
 
 $$
-d_1=\frac{\ln\!\left(\frac{S_0}{K}\right)+(r-q+0.5\sigma^2)T}{\sigma\sqrt{T}},\quad
+d_1=\frac{\ln\left(\frac{S_0}{K}\right)+(r-q+0.5\sigma^2)T}{\sigma\sqrt{T}},\quad
 d_2=d_1-\sigma\sqrt{T}
 $$
 
@@ -86,13 +87,28 @@ Where:
 
 Simulate asset paths under the risk-neutral measure:
 
-1. Generate random draws \( Z \sim N(0,1) \)
-2. Simulate stock price at maturity:  
-   \( S_T = S_0 e^{(r - q - 0.5\sigma^2)T + \sigma\sqrt{T}Z} \)
-3. Compute discounted payoffs:  
-   - Call: \( C = e^{-rT}\max(S_T - K, 0) \)  
-   - Put:  \( P = e^{-rT}\max(K - S_T, 0) \)
-4. Repeat many times and take the **mean payoff** as the option price.
+Simulate the terminal price:
+
+$$
+S_T = S_0 \exp\Big((r-q-\tfrac12\sigma^2)T + \sigma\sqrt{T}\,Z\Big)
+$$
+
+Discounted payoffs (per path):
+
+**Call**
+
+$$
+C = e^{-rT}\max(S_T-K,0)
+$$
+
+**Put**
+
+$$
+P = e^{-rT}\max(K-S_T,0)
+$$
+
+Repeat many times; the **sample mean payoff** is the option price.
+
 
 ---
 
