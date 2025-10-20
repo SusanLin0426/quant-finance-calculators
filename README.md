@@ -72,18 +72,12 @@ $$
 P=K e^{-rT}N(-d_2)-S_0 e^{-qT}N(-d_1)
 $$
 
-Where \(N(\cdot)\) is the standard normal CDF.
+Where N(x) is the CDF of the standard normal distribution
+
 
 ---
 
-
-Where:  
--  N(x): cumulative distribution function (CDF) of the standard normal distribution
-- Where \(N(\cdot)\) is the CDF of the standard normal distribution
-
----
-
-### **2️⃣ Monte Carlo Simulation (Risk-Neutral GBM)**
+### **Monte Carlo Simulation (Risk-Neutral GBM)**
 
 Simulate asset paths under the risk-neutral measure:
 
@@ -112,7 +106,7 @@ Repeat many times; the **sample mean payoff** is the option price.
 
 ---
 
-### **3️⃣ CRR Binomial Tree**
+### **CRR Binomial Tree**
 
 Cox–Ross–Rubinstein discrete-time tree model for both **European** and **American** options.
 
@@ -124,25 +118,16 @@ p = \frac{e^{(r-q)\Delta t} - d}{u - d}, \quad
 \text{df} = e^{-r\Delta t}
 $$
 
-Where \(\Delta t = T / n\) and `n` is the number of steps (e.g., 100, 500).
+Where \(\Delta t = T/n\) and `n` is the number of steps (e.g., 100, 500).
 
 #### Backward Induction
-1. Compute terminal stock prices:  
-   \( S[j,i] = S_0 \cdot u^{(i-j)} \cdot d^j \)
+1. Compute terminal stock prices
 
-2. Compute terminal option payoffs:  
-   - Call: \( v[j,i] = \max(S[j,i] - K, 0) \)  
-   - Put:  \( v[j,i] = \max(K - S[j,i], 0) \)
+2. Compute terminal option payoffs
 
-3. Work backward through the tree:  
-   - **European:**  
-     \( pv[j,i] = \text{df} \cdot (p \cdot pv[j,i+1] + (1-p) \cdot pv[j+1,i+1]) \)  
-   - **American:**  
-     \( pv[j,i] = \max(\text{df} \cdot (p \cdot pv[j,i+1] + (1-p) \cdot pv[j+1,i+1]), v[j,i]) \)
+3. Work backward through the tree
 
-4. The **final option price** is the root node:
-
-
+4. The **final option price** is the root node
 
 
 
