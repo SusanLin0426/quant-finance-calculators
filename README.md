@@ -118,7 +118,7 @@ p = \frac{e^{(r-q)\Delta t} - d}{u - d}, \quad
 \text{df} = e^{-r\Delta t}
 $$
 
-Where \(\Delta t = T/n\) and `n` is the number of steps (e.g., 100, 500).
+Where Delta t = T/n and `n` is the number of steps
 
 #### Backward Induction
 1. Compute terminal stock prices
