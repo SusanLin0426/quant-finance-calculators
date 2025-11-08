@@ -127,7 +127,7 @@ Where Delta t = T/n and `n` is the number of steps
 
 3. Work backward through the tree
 
-4. The **final option price** is the root node
+4. The final option price is the root node
 
 
 
